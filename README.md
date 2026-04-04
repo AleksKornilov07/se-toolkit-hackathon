@@ -1,170 +1,172 @@
-# Lab 9 - Quiz and Hackathon
+# PriceTracker
 
-The lab opens with a quiz and then kicks off the hackathon.
+AI-powered price tracking system that monitors product prices and notifies users when prices drop.
 
-To get the full point for the lab, you need to:
+## One-Sentence Description
 
-- Pass Tasks 1, 2, 3 during the lab AND
-- Finish Tasks 4 and 5 by the usual deadline of Thursday 23:59.
+Tracks product prices across online stores and notifies you when they drop, with AI-powered recommendations on the best time to buy.
 
-Each student builds their own project:
+## Features
 
-- Go from an idea to a deployed product.
-- Use agents and LLMs throughout.
+- **Web Dashboard** — Add products, view current prices, see interactive price history charts
+- **Telegram Bot** — Track items via chat, receive price-drop notifications
+- **AI Agent** — Get buy/wait recommendations based on price trend analysis
+- **Automated Monitoring** — Scheduler checks prices every 5 minutes
+- **Multi-Store Support** — Parse prices from Amazon, BestBuy, and other stores
 
-----
+## Tech Stack
 
-## Task 1 (graded by TA after the lab)
+| Component | Technology |
+|-----------|------------|
+| Backend | FastAPI + Python 3.12 |
+| Database | PostgreSQL 17 |
+| Frontend | React + TypeScript + Chart.js |
+| Telegram Bot | aiogram 3.x |
+| AI Agent | OpenAI SDK + LLM |
+| Scheduler | APScheduler |
+| Deployment | Docker Compose + Caddy |
 
-Pen and paper quiz:
+## Quick Start
 
-- 20 mins;
-- closed book, no devices;
-- you get 3 random questions from the question bank;
-- answer at least 2.
+### Prerequisites
 
-## Task 2 (approved by TA during the lab)
+- Docker & Docker Compose
+- Python 3.12+ (for local bot)
+- Telegram Bot Token (from @BotFather)
 
-Ideate and plan your project.
+### Run Backend + Frontend (VM or Local)
 
-### Project idea
+```bash
+docker compose up -d --build
+```
 
-The project idea must be:
+- Web App: http://localhost:3000
+- API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
 
-- something simple to build;
-- clearly useful;
-- easy to explain.
+### Run Telegram Bot (Local)
 
-Define and show to your TA:
+```bash
+cd bot
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
-- End-user of the product
-- What problem your product solves for the end-user?
-- The product idea in one short sentence.
-- What is the product's core feature?
+# Create .env file
+echo "TELEGRAM_BOT_TOKEN=your_token_here" > .env
+echo "BACKEND_URL=http://localhost:8000" >> .env
 
-### Implementation plan
+python main.py
+```
 
-When the idea is approved, produce a plan for two product versions.
+### Run AI Agent (Local or VM)
 
-Version 1 does one core thing well:
+```bash
+cd agent
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-- Pick the one feature most valuable to the end-user and relatively easy to implement;
-- It is a functioning product, not a prototype;
-- Must be shown to the TA upon completion for feedback.
+# Create .env file
+echo "OPENROUTER_API_KEY=your_key_here" > .env
+echo "BACKEND_URL=http://localhost:8000" >> .env
 
-Version 2 builds upon Version 1:
+python main.py
+```
 
-- Improves the initial feature or adds another one on top;
-- Address TA feedback from the lab;
-- Deploy and make it available for use.
+## Project Structure
 
-The product must have the following components, each fulfilling a useful function:
+```
+price-tracker/
+├── backend/           # FastAPI application
+│   ├── main.py        # Entry point
+│   ├── models.py      # SQLModel database models
+│   ├── schemas.py     # Pydantic schemas
+│   ├── routers/       # API endpoints
+│   ├── services/      # Business logic (price checker)
+│   └── scheduler.py   # APScheduler for price checks
+├── frontend/          # React web application
+│   └── src/
+│       ├── App.tsx    # Main component
+│       └── main.tsx   # Entry point
+├── bot/               # Telegram bot (runs locally)
+│   ├── main.py        # Bot entry point
+│   └── services/      # API client
+├── agent/             # AI price advisor
+│   ├── main.py        # Agent entry point
+│   └── tools/         # API tools for agent
+├── docker-compose.yml # All services
+└── Caddyfile          # Reverse proxy config
+```
 
-- backend;
-- database;
-- end-user-facing client: web app, mobile app, or LLM-powered agent, e.g. `nanobot`.
+## API Endpoints
 
-Note:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/items/?user_id=1` | Add item to track |
+| GET | `/api/items/?user_id=1` | Get all tracked items |
+| GET | `/api/items/{id}/history` | Get price history |
+| DELETE | `/api/items/{id}` | Remove item |
+| GET | `/api/dashboard/stats?user_id=1` | Dashboard statistics |
+| GET | `/health` | Health check |
 
-- You can use the setup from Lab 8 or start from scratch.
-- `Telegram` bots are blocked on university VMs.
+## Telegram Bot Commands
 
-## Task 3 (approved by TA during the lab)
+| Command | Description |
+|---------|-------------|
+| `/start` | Welcome message |
+| `/add` | Add item to track |
+| `/myitems` | View tracked items |
+| `/stop <id>` | Stop tracking item |
+| `/help` | Help message |
 
-Implement Version 1 outlined in the plan:
+## Deployment
 
-- Build one core feature;
-- Follow best practices and git workflow;
-- Test it yourself and fix bugs;
-- Have the TA try it as a user;
-- Take note of the TA feedback;
-- Get TA's approval for the task to be marked as DONE.
+### University VM Setup
 
-## Task 4
+1. Clone repository
+2. Create `.env` files in `backend/`, `bot/`, `agent/`
+3. Run `docker compose up -d --build`
+4. Configure Caddy with your domain
+5. Run bot locally and point to VM backend URL
 
-Implement and deploy Version 2 outlined in the plan:
+### Environment Variables
 
-- Build and polish functionality;
-- Take TA feedback into account;
-- Push all code to the GitHub repo (see the detailed instructions below);
-- Follow best practices and git workflow;
-- Document your solution;
-- Dockerize all services;
-- Deploy it to be accessible to use.
+**Backend (.env):**
+```
+DATABASE_URL=postgresql+asyncpg://pricetracker:password@db:5432/pricetracker
+SECRET_KEY=your_secret_key
+BACKEND_URL=http://localhost:8000
+```
 
-Version 2 can be completed during the lab or after it, before the usual deadline.
+**Bot (.env):**
+```
+TELEGRAM_BOT_TOKEN=your_bot_token
+BACKEND_URL=https://your-vm-domain.com
+```
 
-## Task 5 (demo and PDF submitted through Moodle)
+**Agent (.env):**
+```
+OPENROUTER_API_KEY=your_api_key
+BACKEND_URL=http://backend:8000
+```
 
-Submit a presentation with five slides:
+## Version 1 vs Version 2
 
-1. Title:
+### Version 1 (Lab Demo)
+- Add product by URL
+- View tracked items list
+- View price history chart
+- Delete items
+- Scheduler checks prices every 5 min
 
-   - Product title
-   - Your name
-   - Your university email
-   - Your group
+### Version 2 (Final Deploy)
+- AI agent with price trend analysis
+- Target price alerts via Telegram
+- Multi-store parsing (Amazon, BestBuy)
+- Polished UI with savings statistics
+- Full HTTPS deployment on VM
 
-2. Context:
+## License
 
-   - End-user of the product
-   - What problem your product solves
-   - The product idea in one short sentence
-
-3. Implementation:
-
-   - How you built the product
-   - What went into Version 1 and Version 2
-   - What TA feedback points you addressed
-
-4. Demo:
-
-   - Pre-recorded video demonstration of Version 2 with voice-over (no longer than 2 minutes).
-   - _Note:_ **This is the most important part of the presentation**.
-
-5. Links:
-
-   - Link and QR code for each of these:
-     - The GitHub repo with the product code
-     - Deployed product (latest version)
-
-----
-
-## Publishing the product code on GitHub
-
-- Publish the product code in a repository on `GitHub`.
-
-  The repository must be called `se-toolkit-hackathon`.
-
-- Add the MIT license file to make your product open-source.
-
-- Add `README.md` in the product repository.
-
-  `README.md` structure:
-
-  - Product name (as title)
-
-  - One-line description
-
-  - Demo:
-    - A couple of relevant screenshots of the product
-
-  - Product context:
-
-    - End users
-    - Problem that your product solves for end users
-    - Your solution
-
-  - Features:
-
-    - Implemented and not yet implemented features
-
-  - Usage:
-
-    - Explain how to use your product
-
-  - Deployment:
-
-    - Which OS the VM should run on (you may assume `Ubuntu 24.04` like on your university VMs)
-    - What should be installed on the VM
-    - Step-by-step deployment instructions
+MIT
