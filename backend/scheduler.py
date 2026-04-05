@@ -38,7 +38,7 @@ def start_scheduler():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         check_all_prices,
-        trigger=IntervalTrigger(minutes=5),
+        trigger=IntervalTrigger(minutes=15),
         id="price_check",
         replace_existing=True,
     )

@@ -4,6 +4,8 @@ from decimal import Decimal
 from database import get_session
 from models import User, TrackedItem, PriceHistory
 from schemas import ItemCreate, ItemResponse, PriceHistoryResponse
+from services.price_checker import fetch_price
+import asyncio
 
 router = APIRouter(prefix="/api/items", tags=["items"])
 
@@ -15,16 +17,38 @@ def create_item(item: ItemCreate, user_id: int, db: Session = Depends(get_sessio
         user = User(id=user_id, username=f"user_{user_id}")
         db.add(user)
 
+    # Fetch current price immediately on creation
+    import asyncio
+    try:
+        loop = asyncio.new_event_loop()
+        current_price = loop.run_until_complete(fetch_price(item.url, item.store))
+        loop.close()
+        if current_price is None:
+            current_price = Decimal("0")
+    except Exception:
+        current_price = Decimal("0")
+
     new_item = TrackedItem(
         user_id=user_id,
         name=item.name,
         url=item.url,
         store=item.store,
-        current_price=Decimal("0"),
+        current_price=current_price,
         target_price=item.target_price,
         is_active=True,
     )
     db.add(new_item)
+
+    # Record initial price in history
+    if current_price > 0:
+        history = PriceHistory(
+            item_id=new_item.id,
+            price=current_price,
+            currency="USD",
+            in_stock=True,
+        )
+        db.add(history)
+
     db.commit()
     db.refresh(new_item)
     return new_item

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import create_db_and_tables
-from routers import items, dashboard
+from routers import items, dashboard, ai_analysis
 from scheduler import start_scheduler
 
 scheduler = None
@@ -30,6 +30,7 @@ app.add_middleware(
 
 app.include_router(items.router)
 app.include_router(dashboard.router)
+app.include_router(ai_analysis.router)
 
 
 @app.get("/health")
