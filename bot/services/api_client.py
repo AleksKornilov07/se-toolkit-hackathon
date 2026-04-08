@@ -26,3 +26,18 @@ class PriceTrackerAPI:
             res = await client.delete(f"{self.base_url}/api/items/{item_id}")
             res.raise_for_status()
             return res.json()
+
+    async def update_target_price(self, item_id: int, target_price: float) -> dict:
+        async with httpx.AsyncClient() as client:
+            res = await client.patch(
+                f"{self.base_url}/api/items/{item_id}/target",
+                params={"target_price": target_price}
+            )
+            res.raise_for_status()
+            return res.json()
+
+    async def get_all_items(self) -> list:
+        async with httpx.AsyncClient() as client:
+            res = await client.get(f"{self.base_url}/api/items/all")
+            res.raise_for_status()
+            return res.json()

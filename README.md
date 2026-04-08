@@ -1,172 +1,183 @@
 # PriceTracker
 
-AI-powered price tracking system that monitors product prices and notifies users when prices drop.
+AI-powered price tracker that monitors product prices and notifies users when prices drop below their target.
 
-## One-Sentence Description
+## Demo
 
-Tracks product prices across online stores and notifies you when they drop, with AI-powered recommendations on the best time to buy.
+![PriceTracker Dashboard](https://via.placeholder.com/800x400/3b82f6/ffffff?text=PriceTracker+Dashboard)
+
+*Screenshot: Main dashboard with price history chart and AI-powered buy/wait recommendation.*
+
+![Telegram Bot Notifications](https://via.placeholder.com/400x300/10b981/ffffff?text=Telegram+Bot+Notifications)
+
+*Screenshot: Telegram bot showing price drop notification.*
+
+## Context
+
+### End Users
+Online shoppers who want to save money by tracking product prices and buying at the best moment.
+
+### Problem
+Product prices fluctuate constantly across online stores. Shoppers waste time manually checking prices and miss the best moments to buy.
+
+### Solution
+PriceTracker automatically monitors prices 24/7 and sends Telegram notifications when prices drop below the user's target. An AI agent analyzes price trends and recommends the best time to buy.
 
 ## Features
 
-- **Web Dashboard** — Add products, view current prices, see interactive price history charts
-- **Telegram Bot** — Track items via chat, receive price-drop notifications
-- **AI Agent** — Get buy/wait recommendations based on price trend analysis
-- **Automated Monitoring** — Scheduler checks prices every 5 minutes
-- **Multi-Store Support** — Parse prices from Amazon, BestBuy, and other stores
+### Implemented ✅
+- **Product Tracking** — Add products by URL, automatic price parsing
+- **Price History** — Interactive charts showing price changes over time
+- **Target Price Alerts** — Set your desired price, get notified when it's reached (one-time notification)
+- **AI Price Advisor** — Analyzes price trends, recommends BUY NOW or WAIT
+- **Telegram Bot** — Add items, view tracked items, receive notifications via Telegram
+- **Web Dashboard** — View items, charts, AI analysis, manage target prices
+- **Multi-Currency Support** — Automatically detects $, £, € symbols
+- **User Authentication** — Login via Telegram User ID
+- **Scheduled Monitoring** — Prices checked every 5 minutes
+- **Demo Data Generation** — Simulate price history for demonstration
 
-## Tech Stack
+### Not Yet Implemented 🚧
+- Email notifications
+- Browser extension for 1-click item addition
+- Mobile app (React Native)
+- Multi-store price comparison
+- Historical savings statistics
 
-| Component | Technology |
-|-----------|------------|
-| Backend | FastAPI + Python 3.12 |
-| Database | PostgreSQL 17 |
-| Frontend | React + TypeScript + Chart.js |
-| Telegram Bot | aiogram 3.x |
-| AI Agent | OpenAI SDK + LLM |
-| Scheduler | APScheduler |
-| Deployment | Docker Compose + Caddy |
+## Usage
 
-## Quick Start
+### Web App
+1. Open `http://your-vm-ip:3000`
+2. Enter your Telegram User ID (get it from `/start` in the bot)
+3. Add a product URL and your target price
+4. View price charts and AI recommendations
 
-### Prerequisites
+### Telegram Bot
+1. Send `/start` to the bot — get your User ID
+2. Send `/add` — bot asks for product URL
+3. Send the URL — bot asks for target price
+4. Enter target price — bot confirms tracking
+5. Bot notifies you when price drops below target
 
-- Docker & Docker Compose
-- Python 3.12+ (for local bot)
-- Telegram Bot Token (from @BotFather)
+**Bot Commands:**
+| Command | Description |
+|---|---|
+| `/start` | Start bot, get your User ID |
+| `/id` | Show your User ID |
+| `/add` | Add a product to track |
+| `/myitems` | View your tracked items |
+| `/setnewprice <id> <price>` | Update target price |
+| `/stop <id>` | Stop tracking an item |
+| `/help` | Show all commands |
 
-### Run Backend + Frontend (VM or Local)
+## Deployment
 
+### VM Requirements
+- **OS:** Ubuntu 24.04 LTS
+- **Pre-installed:** Docker, Docker Compose Plugin
+
+### Step-by-Step Deployment
+
+#### 1. Install Docker on VM
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y docker.io docker-compose-plugin
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker $USER
+```
+
+Log out and log back in for group changes to take effect.
+
+#### 2. Clone the Repository
+```bash
+cd ~
+git clone https://github.com/AleksKornilov07/se-toolkit-hackathon.git price-tracker
+cd price-tracker
+```
+
+#### 3. Create Environment File
+```bash
+nano .env
+```
+
+Add the following:
+```env
+POSTGRES_USER=pricetracker
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=pricetracker
+DATABASE_URL=postgresql://pricetracker:your_secure_password@db:5432/pricetracker
+SECRET_KEY=your_secret_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+```
+
+#### 4. Start All Services
 ```bash
 docker compose up -d --build
 ```
 
-- Web App: http://localhost:3000
-- API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+#### 5. Verify Deployment
+```bash
+docker compose ps
+curl http://localhost:8000/health
+```
 
-### Run Telegram Bot (Local)
+Expected output: `{"status":"ok"}`
+
+#### 6. Configure Reverse Proxy (Optional)
+For HTTPS access, configure Caddy:
+```bash
+# Edit Caddyfile
+nano Caddyfile
+# Add your domain:
+# your-domain.com {
+#     reverse_proxy /api/* backend:8000
+#     reverse_proxy /* frontend:3000
+# }
+docker compose restart caddy
+```
+
+#### 7. Start Telegram Bot (Local Machine)
+The bot runs on your local machine (Telegram is blocked on university VMs).
 
 ```bash
 cd bot
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 
-# Create .env file
-echo "TELEGRAM_BOT_TOKEN=your_token_here" > .env
-echo "BACKEND_URL=http://localhost:8000" >> .env
+# Create .env
+echo "TELEGRAM_BOT_TOKEN=your_bot_token" > .env
+echo "BACKEND_URL=http://your-vm-ip:8000" >> .env
 
 python main.py
 ```
 
-### Run AI Agent (Local or VM)
+### Service Architecture
+```
+University VM:
+  ├── Backend (FastAPI) :8000
+  ├── Frontend (React) :3000
+  ├── PostgreSQL (Database) :5432
+  ├── AI Agent (nanobot)
+  ├── Scheduler (APScheduler) — checks prices every 5 min
+  └── Caddy (Reverse Proxy) — HTTPS
 
-```bash
-cd agent
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Create .env file
-echo "OPENROUTER_API_KEY=your_key_here" > .env
-echo "BACKEND_URL=http://localhost:8000" >> .env
-
-python main.py
+Local Machine:
+  └── Telegram Bot (aiogram) — connects to VM via HTTP
 ```
 
-## Project Structure
-
-```
-price-tracker/
-├── backend/           # FastAPI application
-│   ├── main.py        # Entry point
-│   ├── models.py      # SQLModel database models
-│   ├── schemas.py     # Pydantic schemas
-│   ├── routers/       # API endpoints
-│   ├── services/      # Business logic (price checker)
-│   └── scheduler.py   # APScheduler for price checks
-├── frontend/          # React web application
-│   └── src/
-│       ├── App.tsx    # Main component
-│       └── main.tsx   # Entry point
-├── bot/               # Telegram bot (runs locally)
-│   ├── main.py        # Bot entry point
-│   └── services/      # API client
-├── agent/             # AI price advisor
-│   ├── main.py        # Agent entry point
-│   └── tools/         # API tools for agent
-├── docker-compose.yml # All services
-└── Caddyfile          # Reverse proxy config
-```
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/items/?user_id=1` | Add item to track |
-| GET | `/api/items/?user_id=1` | Get all tracked items |
-| GET | `/api/items/{id}/history` | Get price history |
-| DELETE | `/api/items/{id}` | Remove item |
-| GET | `/api/dashboard/stats?user_id=1` | Dashboard statistics |
-| GET | `/health` | Health check |
-
-## Telegram Bot Commands
-
-| Command | Description |
-|---------|-------------|
-| `/start` | Welcome message |
-| `/add` | Add item to track |
-| `/myitems` | View tracked items |
-| `/stop <id>` | Stop tracking item |
-| `/help` | Help message |
-
-## Deployment
-
-### University VM Setup
-
-1. Clone repository
-2. Create `.env` files in `backend/`, `bot/`, `agent/`
-3. Run `docker compose up -d --build`
-4. Configure Caddy with your domain
-5. Run bot locally and point to VM backend URL
-
-### Environment Variables
-
-**Backend (.env):**
-```
-DATABASE_URL=postgresql+asyncpg://pricetracker:password@db:5432/pricetracker
-SECRET_KEY=your_secret_key
-BACKEND_URL=http://localhost:8000
-```
-
-**Bot (.env):**
-```
-TELEGRAM_BOT_TOKEN=your_bot_token
-BACKEND_URL=https://your-vm-domain.com
-```
-
-**Agent (.env):**
-```
-OPENROUTER_API_KEY=your_api_key
-BACKEND_URL=http://backend:8000
-```
-
-## Version 1 vs Version 2
-
-### Version 1 (Lab Demo)
-- Add product by URL
-- View tracked items list
-- View price history chart
-- Delete items
-- Scheduler checks prices every 5 min
-
-### Version 2 (Final Deploy)
-- AI agent with price trend analysis
-- Target price alerts via Telegram
-- Multi-store parsing (Amazon, BestBuy)
-- Polished UI with savings statistics
-- Full HTTPS deployment on VM
+## Tech Stack
+| Layer | Technology |
+|---|---|
+| Backend | Python + FastAPI + SQLModel |
+| Database | PostgreSQL |
+| Frontend | React + TypeScript + Chart.js |
+| Bot | aiogram (Telegram) |
+| AI Agent | nanobot + LLM API (OpenRouter) |
+| Scheduler | APScheduler |
+| Deployment | Docker Compose + Caddy |
 
 ## License
-
-MIT
+MIT — see [LICENSE](LICENSE) for details.
