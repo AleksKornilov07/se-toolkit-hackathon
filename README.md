@@ -148,9 +148,9 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 
 # Create .env
-echo "TELEGRAM_BOT_LINK=https://t.me/PriceTracker240783_bot" > .env
-echo "BACKEND_URL=http://10.93.25.235:8000" >> .env
-echo "FRONTEND_URL=http://10.93.25.235:3000/" >> .
+echo "TELEGRAM_BOT_TOKEN=your.bot.token" > .env
+echo "BACKEND_URL=http://your.vm:8000" >> .env
+echo "FRONTEND_URL=http://your.vm:3000/" >> .
 
 python main.py
 ```
