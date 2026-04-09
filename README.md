@@ -2,15 +2,20 @@
 
 AI-powered price tracker that monitors product prices and notifies users when prices drop below their target.
 
+##Links
+tg_bot = https://t.me/PriceTracker240783_bot
+website = http://10.93.25.235:3000/
+
 ## Demo
 
-![PriceTracker Dashboard](https://via.placeholder.com/800x400/3b82f6/ffffff?text=PriceTracker+Dashboard)
+![PriceTracker Dashboard](screenshots/dashboard.png)
+  *Screenshot: Main dashboard with price history chart and AI-powered buy/wait recommendation.*
 
-*Screenshot: Main dashboard with price history chart and AI-powered buy/wait recommendation.*
+  ![Price History Chart](screenshots/ai-analysis.png)
+  *Screenshot: Interactive price history chart for a tracked product.*
 
-![Telegram Bot Notifications](https://via.placeholder.com/400x300/10b981/ffffff?text=Telegram+Bot+Notifications)
-
-*Screenshot: Telegram bot showing price drop notification.*
+  ![Telegram Bot](screenshots/bot-notification.png)
+  *Screenshot: Telegram bot showing tracked items and price alerts.*
 
 ## Context
 
