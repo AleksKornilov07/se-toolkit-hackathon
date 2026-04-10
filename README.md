@@ -2,9 +2,7 @@
 
 AI-powered price tracker that monitors product prices and notifies users when prices drop below their target.
 
-##Links
-tg_bot = https://t.me/PriceTracker240783_bot
-website = http://10.93.25.235:3000/
+
 
 ## Demo
 
@@ -50,6 +48,11 @@ PriceTracker automatically monitors prices 24/7 and sends Telegram notifications
 - Historical savings statistics
 
 ## Usage
+Links
+
+tg_bot = https://t.me/PriceTracker240783_bot
+
+website = http://10.93.25.235:3000/
 
 ### Web App
 1. Open `http://your-vm-ip:3000`
